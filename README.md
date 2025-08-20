@@ -8,7 +8,7 @@ Repositori ini dibuat untuk kegiatan **Training Robotika di MAN 2 Rembang**. Di 
 
 Berikut adalah daftar materi yang akan kita pelajari. Klik link untuk mengakses materi.
 
-| Materi | Link |
+| **Materi** | **Link** |
 | :--: | :--: |
 | 🚀 **Dasar Bahasa C** | [Lihat Wiki](https://github.com/bielnzar/Training-Robotika_MAN-2/wiki) |
 
