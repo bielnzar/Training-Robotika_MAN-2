@@ -1,4 +1,4 @@
-# 🤖 Modul Hari ke-1: Pengenalan Sensor & Komponen
+# 🤖 Modul Day-1: Pengenalan Sensor & Komponen
 
 Selamat datang, para calon inovator! 👋
 

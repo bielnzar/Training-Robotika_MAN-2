@@ -11,7 +11,8 @@ Berikut adalah daftar materi yang akan kita pelajari. Klik link untuk mengakses 
 | **Materi** | **Link** |
 | :--: | :--: |
 | 🚀 Dasar Bahasa C | [Lihat Wiki](https://github.com/bielnzar/Training-Robotika_MAN-2/wiki) |
-| Prepare Environment | [Link]()
+| ⚙️ Prepare Environment | [Persiapan Sebelum Ngoding](https://github.com/bielnzar/Training-Robotika_MAN-2/blob/main/Prepare_Environment/README.md) |
+| 👀 Sensor & Komponen | [Pengenalan Sensor & Komponen](https://github.com/bielnzar/Training-Robotika_MAN-2/blob/main/Belajar_Sensor/README.md) |
 
 ---
 
