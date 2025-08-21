@@ -10,7 +10,8 @@ Berikut adalah daftar materi yang akan kita pelajari. Klik link untuk mengakses 
 
 | **Materi** | **Link** |
 | :--: | :--: |
-| 🚀 **Dasar Bahasa C** | [Lihat Wiki](https://github.com/bielnzar/Training-Robotika_MAN-2/wiki) |
+| 🚀 Dasar Bahasa C | [Lihat Wiki](https://github.com/bielnzar/Training-Robotika_MAN-2/wiki) |
+| Prepare Environment | [Link]()
 
 ---
 
