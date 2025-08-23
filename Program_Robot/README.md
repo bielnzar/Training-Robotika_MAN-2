@@ -1,6 +1,6 @@
 # Modul Pembelajaran Pemrograman Robot
 
-Selamat datang di modul pembelajaran pemrograman robot! Modul ini akan memandu Anda dalam memahami dasar-dasar pemrograman robot menggunakan platform Arduino.
+Selamat datang di modul pembelajaran pemrograman robot! Modul ini akan memandu kita dalam memahami dasar-dasar pemrograman robot menggunakan platform Arduino.
 
 ## Konfigurasi Pin
 
@@ -53,7 +53,7 @@ Pada konfigurasi kita:
 - **Trig Sensor Ultrasonik (A3):** Pin `Trig` hanya perlu diberi sinyal HIGH sesaat untuk memicu pengiriman gelombang suara. Meskipun kita menggunakan pin A3 (pin analog), pin analog pada Arduino juga bisa berfungsi sebagai pin digital.
 
 #### Pulse Width Modulation (PWM)
-Beberapa pin digital (ditandai dengan `~` di papan Arduino, seperti D3, D5, D6, D9, D10, D11) memiliki kemampuan khusus yang disebut **PWM (Pulse Width Modulation)**. PWM memungkinkan kita untuk mensimulasikan output analog. Alih-alih hanya HIGH atau LOW, kita bisa mengatur "kecerahan" LED atau "kecepatan" motor dengan mengirimkan pulsa sinyal HIGH dan LOW dengan sangat cepat.
+Beberapa pin digital (ditkitai dengan `~` di papan Arduino, seperti D3, D5, D6, D9, D10, D11) memiliki kemampuan khusus yang disebut **PWM (Pulse Width Modulation)**. PWM memungkinkan kita untuk mensimulasikan output analog. Alih-alih hanya HIGH atau LOW, kita bisa mengatur "kecerahan" LED atau "kecepatan" motor dengan mengirimkan pulsa sinyal HIGH dan LOW dengan sangat cepat.
 
 Pada konfigurasi kita:
 - **ENA (D10) dan ENB (D5):** Pin ini terhubung ke pin *Enable* pada driver motor. Dengan memberikan sinyal PWM ke pin ini, kita dapat mengatur kecepatan putaran motor. Nilai PWM berkisar dari 0 (motor berhenti) hingga 255 (kecepatan penuh).
@@ -72,7 +72,7 @@ Dengan memahami fungsi masing-masing pin, kita dapat merancang robot yang efisie
 
 Sebelum melangkah lebih jauh, sangat penting untuk memastikan bahwa kedua motor berputar ke arah yang benar (maju). Jika tidak, robot tidak akan bisa bergerak lurus. Kita akan menggunakan program sederhana di bawah ini untuk menguji setiap motor secara terpisah.
 
-Buat file baru di Arduino IDE, salin kode di bawah, unggah ke Arduino Anda, dan buka **Serial Monitor** (Tools -> Serial Monitor) dengan baud rate 9600.
+Buat file baru di Arduino IDE, salin kode di bawah, unggah ke Arduino kita, dan buka **Serial Monitor** (Tools -> Serial Monitor) dengan baud rate 9600.
 
 ```cpp
 // ==== PROGRAM UJI ARAH MOTOR ====
@@ -146,7 +146,7 @@ void loop() {
 3.  Perhatikan roda kiri. Apakah ia juga berputar ke arah **maju**?
 
 **Jika ada motor yang berputar mundur:**
--   Misalnya, jika motor kiri berputar mundur saat diuji, Anda hanya perlu menukar logika pin `IN3` dan `IN4` di dalam kode. Cari bagian "Perintah MAJU untuk motor kiri" dan ubah dari `digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);` menjadi `digitalWrite(IN3, LOW); digitalWrite(IN4, HIGH);`.
+-   Misalnya, jika motor kiri berputar mundur saat diuji, kita hanya perlu menukar logika pin `IN3` dan `IN4` di dalam kode. Cari bagian "Perintah MAJU untuk motor kiri" dan ubah dari `digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);` menjadi `digitalWrite(IN3, LOW); digitalWrite(IN4, HIGH);`.
 -   Lakukan hal yang sama untuk motor kanan jika diperlukan (tukar logika `IN1` dan `IN2`).
 
 Setelah kedua motor dipastikan berputar maju, kita bisa melanjutkan ke langkah berikutnya.
@@ -154,7 +154,7 @@ Setelah kedua motor dipastikan berputar maju, kita bisa melanjutkan ke langkah b
 Selanjutnya, kita akan mulai menulis kode berdasarkan konfigurasi pin ini.
 
 ### Cara Kerja Driver Motor: Logika HIGH dan LOW
-Anda mungkin bertanya, mengapa untuk bergerak "maju" kita perlu satu pin `HIGH` dan satu pin `LOW`? Jawabannya terletak pada cara kerja komponen di dalam driver motor yang disebut **H-Bridge**.
+kita mungkin bertanya, mengapa untuk bergerak "maju" kita perlu satu pin `HIGH` dan satu pin `LOW`? Jawabannya terletak pada cara kerja komponen di dalam driver motor yang disebut **H-Bridge**.
 
 Bayangkan H-Bridge seperti empat saklar elektronik yang mengendalikan arah aliran listrik ke motor.
 
@@ -179,7 +179,7 @@ Keuntungan menggunakan fungsi:
 Berikut adalah program untuk membuat robot bergerak maju, berhenti, mundur, lalu berhenti lagi, secara berulang. Program ini juga akan menyalakan LED sebagai indikator status robot.
 
 ```cpp
-// ==== PENGATURAN PIN (SESUAI RAKITAN ANDA) ====
+// ==== PENGATURAN PIN (SESUAI RAKITAN kita) ====
 // --- Motor Kanan ---
 #define ENA 10
 #define IN1 9
@@ -281,7 +281,7 @@ void berhenti() {
 }
 ```
 
-Unggah kode di atas ke Arduino Anda. Robot seharusnya akan bergerak maju selama 3 detik, berhenti 1 detik, mundur 3 detik, berhenti 1 detik, dan terus mengulang pola tersebut. Perhatikan juga lampu LED yang menyala sesuai statusnya.
+Unggah kode di atas ke Arduino kita. Robot seharusnya akan bergerak maju selama 3 detik, berhenti 1 detik, mundur 3 detik, berhenti 1 detik, dan terus mengulang pola tersebut. Perhatikan juga lampu LED yang menyala sesuai statusnya.
 
 ---
 
@@ -298,7 +298,7 @@ Dengan cara ini, robot akan berputar di tempat tanpa berpindah posisi terlalu ja
 Berikut adalah program yang menambahkan dua fungsi baru, yaitu `putarKanan()` dan `putarKiri()`:
 
 ```cpp
-// ==== PENGATURAN PIN (SESUAI RAKITAN ANDA) ====
+// ==== PENGATURAN PIN (SESUAI RAKITAN kita) ====
 // --- Motor Kanan ---
 #define ENA 10
 #define IN1 9
@@ -423,11 +423,11 @@ void berhenti() {
 
 Perhatikan bahwa kita menggunakan kecepatan 100 (lebih rendah dari sebelumnya), karena gerakan berputar tidak perlu secepat maju/mundur. Kecepatan yang lebih rendah memberikan kontrol yang lebih baik saat berputar.
 
-Unggah kode di atas ke Arduino Anda. Robot seharusnya akan mengeksekusi serangkaian gerakan: maju, berhenti, mundur, berhenti, putar kanan, berhenti, putar kiri, berhenti, lalu mengulang pola tersebut.
+Unggah kode di atas ke Arduino kita. Robot seharusnya akan mengeksekusi serangkaian gerakan: maju, berhenti, mundur, berhenti, putar kanan, berhenti, putar kiri, berhenti, lalu mengulang pola tersebut.
 
 ### Tips:
 - Jika robot berputar terlalu cepat, turunkan nilai variabel `kecepatan`.
-- Anda juga bisa membuat fungsi khusus dengan kecepatan berbeda untuk berputar, misalnya dengan membuat fungsi `putarKananPelan()` yang menggunakan kecepatan lebih rendah khusus untuk berputar.
+- kita juga bisa membuat fungsi khusus dengan kecepatan berbeda untuk berputar, misalnya dengan membuat fungsi `putarKananPelan()` yang menggunakan kecepatan lebih rendah khusus untuk berputar.
 
 ---
 
@@ -506,6 +506,7 @@ void loop() {
   long jarak = ukurJarakCm();
 
   // 2. Tampilkan jarak di Serial Monitor untuk debugging
+  // Ini sangat membantu untuk memastikan sensor bekerja dengan benar
   Serial.print("Jarak di depan: ");
   Serial.print(jarak);
   Serial.println(" cm");
@@ -560,13 +561,15 @@ long ukurJarakCm() {
 }
 
 
-// ==== FUNGSI-FUNGSI KONTROL GERAK (Sedikit dimodifikasi) ====
+// ==== FUNGSI-FUNGSI KONTROL GERAK ====
 void maju() {
   // LED Hijau: Sedang maju
   digitalWrite(LED_HIJAU, HIGH);
   digitalWrite(LED_KUNING, LOW);
   digitalWrite(LED_MERAH, LOW);
   
+  // Atur arah motor maju
+  // Pastikan logika HIGH/LOW ini sesuai dengan hasil tes di Langkah 1
   digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
   digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
   analogWrite(ENA, kecepatanMaju);
@@ -617,6 +620,7 @@ void berhenti() {
   digitalWrite(LED_KUNING, LOW);
   digitalWrite(LED_MERAH, HIGH);
 
+  // Matikan semua motor (gunakan mode rem/brake)
   digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
   analogWrite(ENA, 0);
@@ -624,7 +628,7 @@ void berhenti() {
 }
 ```
 
-Unggah kode ini dan letakkan robot Anda di lantai. Coba letakkan tangan atau buku di depannya. Robot seharusnya berhenti, berputar untuk mencari jalan lain, dan kemudian melanjutkan perjalanannya. Selamat, Anda telah membuat robot otonom pertama Anda!
+Unggah kode ini dan letakkan robot kita di lantai. Coba letakkan tangan atau buku di depannya. Robot seharusnya berhenti, berputar untuk mencari jalan lain, dan kemudian melanjutkan perjalanannya. Selamat, kita telah membuat robot otonom pertama kita!
 
 ---
 
@@ -785,7 +789,7 @@ void berhenti() {
 ```
 
 ### Tips dan Kalibrasi
-- **Buka Serial Monitor:** Saat pertama kali mencoba, buka Serial Monitor di Arduino IDE. Amati nilai yang dikeluarkan sensor saat Anda meletakkannya di atas permukaan putih dan hitam. Pastikan logikanya sesuai (Putih = 0, Hitam = 1). Jika terbalik, Anda hanya perlu membalik logika `HIGH` dan `LOW` di dalam `if` statement.
+- **Buka Serial Monitor:** Saat pertama kali mencoba, buka Serial Monitor di Arduino IDE. Amati nilai yang dikeluarkan sensor saat kita meletakkannya di atas permukaan putih dan hitam. Pastikan logikanya sesuai (Putih = 0, Hitam = 1). Jika terbalik, kita hanya perlu membalik logika `HIGH` dan `LOW` di dalam `if` statement.
 - **Atur Kecepatan:** `kecepatanMaju` dan `kecepatanBelok` mungkin perlu disesuaikan. Jika robot sering keluar jalur, coba kurangi kecepatannya. Jika gerakannya patah-patah, coba naikkan sedikit `kecepatanBelok`.
 - **Posisi Sensor:** Jarak antara kedua sensor sangat mempengaruhi performa. Jika terlalu rapat, robot akan bergetar hebat. Jika terlalu lebar, robot mungkin akan kehilangan garis di tikungan tajam.
 
@@ -821,12 +825,18 @@ Setelah berhasil melewati halangan, robot tidak tahu di mana garis berada. Fungs
 Berikut adalah kode lengkap untuk menggabungkan kedua fungsi tersebut:
 
 ```cpp
+// ==== PENGATURAN PIN ====
+// --- Motor Kanan ---
 #define ENA 10
 #define IN1 9
 #define IN2 8
+
+// --- Motor Kiri ---
 #define ENB 5
 #define IN3 7
 #define IN4 6
+
+// --- Sensor Ultrasonik ---
 #define TRIG_PIN A3
 #define ECHO_PIN A2
 #define PIN_IR_KANAN 11
@@ -843,16 +853,16 @@ int kecepatanPutarObstacle = 80;
 int jarakAman = 20;
 int kecepatanCariGaris = 60; 
 
-// --- Durasi Manuver Menghindar ---
-const int WAKTU_PUTAR_90_DERAJAT = 700;
-const int WAKTU_MAJU_SAMPING = 600;
-const int WAKTU_MAJU_LEWATI_HALANGAN = 600;
+// --- Durasi Manuver Menghindar (perlu dikalibrasi) ---
+const int WAKTU_PUTAR_90_DERAJAT = 700;    // ms
+const int WAKTU_MAJU_SAMPING = 600;        // ms
+const int WAKTU_MAJU_LEWATI_HALANGAN = 600;// ms
 
 // === Pengaturan Pencarian Garis ===
 const int LANGKAH_MAKSIMAL_CARI = 20;
-const int WAKTU_PER_POTONGAN = 10;          // DISARANKAN: 10ms agar gerakan lebih stabil
-const int JUMLAH_POTONGAN_MAJU = 200;        // Lakukan 200 potongan (10ms * 200 = 2000ms = 2.0 detik)
-const int WAKTU_PUTAR_CARI = 700;
+const int WAKTU_PER_POTONGAN = 10;
+const int JUMLAH_POTONGAN_MAJU = 200;
+const int WAKTU_PUTAR_CASTING = 700;
 
 void setup() {
   Serial.begin(9600);
@@ -931,7 +941,7 @@ void modeCariGaris() {
       }
     }
 
-    if (garisDitemukan == true) {
+    if (garisDitemukan) {
       Serial.println("Garis ditemukan saat bergerak maju!");
       tengahkanPosisiPadaGaris();
       return;
@@ -941,7 +951,7 @@ void modeCariGaris() {
     delay(200);
     Serial.println("  -> Garis tidak ditemukan, melakukan putaran...");
     putarKiri(kecepatanPutarObstacle);
-    delay(WAKTU_PUTAR_CARI);
+    delay(WAKTU_PUTAR_CASTING);
     berhenti();
     delay(200);
   }
@@ -955,15 +965,12 @@ void tengahkanPosisiPadaGaris(){
   berhenti();
   delay(100);
 
-  // Prioritas 1: Tangani kasus kedua sensor di garis hitam
   if (digitalRead(PIN_IR_KIRI) == HIGH && digitalRead(PIN_IR_KANAN) == HIGH) {
     Serial.println("Garis lebar terdeteksi. Memutar untuk mencari tepi...");
-    // Putar sampai sensor KIRI menemukan tepi putih
     while(digitalRead(PIN_IR_KIRI) == HIGH) { 
       putarKiri(kecepatanCariGaris);
     }
   } 
-  // Prioritas 2: Tangani kasus normal (salah satu sensor)
   else if (digitalRead(PIN_IR_KIRI) == HIGH) {
     Serial.println("Garis di KIRI. Menyejajarkan...");
     while(digitalRead(PIN_IR_KIRI) == HIGH){
@@ -986,7 +993,7 @@ long ukurJarakCm() {
   digitalWrite(TRIG_PIN, LOW); delayMicroseconds(2);
   digitalWrite(TRIG_PIN, HIGH); delayMicroseconds(10);
   digitalWrite(TRIG_PIN, LOW);
-  long durasi = pulseIn(ECHO_PIN, HIGH, 25000);
+  long durasi = pulseIn(ECHO_PIN, HIGH, 25000); // Timeout 25ms
   return durasi * 0.034 / 2;
 }
 
@@ -1021,8 +1028,418 @@ void berhenti() {
 
 ### Penjelasan Kode dan Kalibrasi
 - **`void loop()`**: Sangat bersih dan efisien. Hanya ada `if-else` untuk memilih antara `hindariHalangan()` atau `ikutiGaris()`. Ini menunjukkan prioritas yang jelas: keamanan (menghindari tabrakan) adalah nomor satu.
-- **`hindariHalangan()`**: Fungsi ini seperti sebuah "skrip" gerakan. Ia menjalankan serangkaian perintah maju, putar, dan berhenti dengan durasi (`delay`) yang sudah ditentukan. **PENTING:** Nilai `WAKTU_PUTAR_90_DERAJAT`, `WAKTU_MAJU_SAMPING`, dll., sangat bergantung pada kecepatan motor, voltase baterai, dan permukaan lantai. Anda **harus** mengkalibrasi nilai-nilai ini agar robot bisa bermanuver dengan mulus.
-- **`modeCariGaris()`**: Ini adalah logika pencarian yang cukup tangguh. Ia mencoba maju, lalu berputar, berulang kali. Jika robot Anda kesulitan menemukan garis, Anda bisa mengubah `LANGKAH_MAKSIMAL_CARI` atau `WAKTU_PUTAR_CARI`.
+- **`hindariHalangan()`**: Fungsi ini seperti sebuah "skrip" gerakan. Ia menjalankan serangkaian perintah maju, putar, dan berhenti dengan durasi (`delay`) yang sudah ditentukan. **PENTING:** Nilai `WAKTU_PUTAR_90_DERAJAT`, `WAKTU_MAJU_SAMPING`, dll., sangat bergantung pada kecepatan motor, voltase baterai, dan permukaan lantai. kita **harus** mengkalibrasi nilai-nilai ini agar robot bisa bermanuver dengan mulus.
+- **`modeCariGaris()`**: Ini adalah logika pencarian yang cukup tangguh. Ia mencoba maju, lalu berputar, berulang kali. Jika robot kita kesulitan menemukan garis, kita bisa mengubah `LANGKAH_MAKSIMAL_CARI` atau `WAKTU_PUTAR_CASTING`.
 - **`tengahkanPosisiPadaGaris()`**: Setelah garis ditemukan, fungsi ini memastikan robot berada di posisi yang benar sebelum kembali ke mode `ikutiGaris`. Ia akan memutar sedikit sampai kedua sensor tidak lagi melihat garis hitam, menempatkan robot tepat di tengah.
 - **Fungsi Gerak dengan Parameter**: Perhatikan fungsi `maju()`, `putarKiri()`, dan `putarKanan()` sekarang menerima parameter `int kecepatan`. Ini membuat kode lebih fleksibel karena kita bisa memanggil fungsi yang sama dengan kecepatan yang berbeda-beda tergantung situasinya (misal: lebih lambat saat mencari garis, lebih cepat saat mengikuti garis lurus).
 
+## Materi 7: Menggabungkan Line Follower dan Obstacle Avoidance (Versi Kompleks)
+
+Setelah mempelajari versi sederhana, sekarang kita akan meningkatkan robot dengan pendekatan yang lebih canggih. Versi kompleks ini mengatasi keterbatasan versi sederhana dengan menggunakan **State Machine** dan teknik **Non-Blocking**.
+
+### Apa yang Berbeda dari Versi Sebelumnya?
+
+1. **State Machine**: Alih-alih menggunakan banyak `if-else` dan `delay()`, kita menggunakan "mesin status" untuk mengelola perilaku robot.
+2. **Non-Blocking**: Robot tidak "berhenti berpikir" selama melakukan manuver. Hal ini memungkinkan robot untuk tetap responsif.
+3. **Pencarian Lebih Cerdas**: Algoritma pencarian garis bekerja dengan pola zig-zag untuk meningkatkan kemungkinan menemukan kembali garis.
+
+### Konsep State Machine
+
+State Machine adalah pola desain yang membagi perilaku robot menjadi "status" yang berbeda. Robot hanya bisa berada dalam satu status pada satu waktu. Dalam kode kita, status-status tersebut adalah:
+
+```
+enum RobotState {
+  MENGIKUTI_GARIS,    // Robot mengikuti garis seperti biasa
+  MENGHINDARI_HALANGAN, // Robot sedang bermanuver menghindari halangan
+  MENCARI_GARIS,      // Robot kehilangan garis dan sedang mencarinya
+  MENENGAHKAN_POSISI  // Robot menemukan garis dan sedang menyesuaikan posisi
+}
+```
+
+Keuntungan pendekatan ini:
+- **Terstruktur**: Kode menjadi lebih terorganisir karena setiap status memiliki fungsi sendiri.
+- **Mudah Diperluas**: Ingin menambahkan perilaku baru? Cukup tambahkan status baru!
+- **Lebih Jelas**: Dengan melihat status saat ini, kita tahu persis apa yang sedang dilakukan robot.
+
+### Pendekatan Non-Blocking
+
+Pada versi sebelumnya, kita sering menggunakan `delay()` untuk menunggu selesainya suatu gerakan. Masalahnya, selama `delay()` robot tidak dapat melakukan apapun lainnya - termasuk mengecek sensor.
+
+Dalam pendekatan non-blocking:
+- Kita menggunakan `millis()` untuk mengukur waktu berlalu tanpa menghentikan eksekusi kode.
+- Robot bisa terus memeriksa sensor dan bereaksi terhadap perubahan lingkungan.
+- Manuver kompleks dijalankan langkah demi langkah, dengan robot tetap "sadar" selama prosesnya.
+
+Perhatikan perbedaan struktur di antara dua pendekatan:
+
+**Blocking (Versi Sederhana):**
+```cpp
+void hindariHalangan() {
+  berhenti(); delay(500);
+  putarKanan(kecepatanPutarObstacle); delay(WAKTU_PUTAR_90_DERAJAT);
+  berhenti(); delay(500);
+  // ...dan seterusnya
+}
+```
+
+**Non-Blocking (Versi Kompleks):**
+```cpp
+void hindariHalangan_nonBlocking() {
+  unsigned long currentTime = millis();
+
+  switch (manuverStep) {
+    case 0: // Jeda awal
+      if (currentTime - stateStartTime >= WAKTU_JEDA_ANTAR_MANUVER) {
+        manuverStep++; 
+        stateStartTime = currentTime;
+      }
+      else { 
+        berhenti(); 
+      }
+      break;
+    case 1: // Putar Kanan
+      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKanan(KECEPATAN_PUTAR_HINDAR); } 
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 2: // Maju Samping
+      if (currentTime - stateStartTime < WAKTU_MAJU_SAMPING) { maju(KECEPATAN_MAJU_NORMAL); }
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 3: // Putar Kiri
+      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKiri(KECEPATAN_PUTAR_HINDAR); }
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 4: // Maju Lewati
+      if (currentTime - stateStartTime < WAKTU_MAJU_LEWATI) { maju(KECEPATAN_MAJU_NORMAL); }
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 5: // Putar Kiri lagi
+      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKiri(KECEPATAN_PUTAR_HINDAR); }
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 6: // Selesai, masuk mode cari garis
+      currentState = MENCARI_GARIS;
+      Serial.println("State -> MENCARI_GARIS");
+      break;
+  }
+}
+```
+
+### Pencarian Garis yang Lebih Cerdas
+
+Alih-alih melakukan "putaran besar" untuk mencari garis, versi kompleks menggunakan pola zig-zag:
+
+1. Bergerak maju sedikit.
+2. Berputar sedikit ke kiri.
+3. Bergerak maju sedikit lagi.
+4. Berputar sedikit ke kanan.
+5. Ulangi dengan jarak putaran yang semakin besar.
+
+Ini meningkatkan peluang menemukan garis dan mengurangi jarak penyimpangan robot dari jalur aslinya.
+
+### Variabel Penting dalam Kode
+
+- **`currentState`**: Menyimpan status robot saat ini.
+- **`stateStartTime`**: Menyimpan waktu mulai status saat ini (untuk perhitungan waktu).
+- **`manuverStep`**: Untuk melacak langkah dalam suatu manuver kompleks.
+- **`belokKiriTerakhir`**: Menentukan arah pencarian berikutnya saat mencari garis.
+
+### Mekanisme Transisi Status
+
+Transisi antar status terjadi berdasarkan kondisi tertentu:
+
+1. **Dari MENGIKUTI_GARIS ke MENGHINDARI_HALANGAN**: Terjadi ketika robot mendeteksi halangan dalam jarak aman.
+   ```cpp
+   if (jarak <= JARAK_AMAN_CM && jarak > 0 && currentState == MENGIKUTI_GARIS) {
+     currentState = MENGHINDARI_HALANGAN;
+     // ...
+   }
+   ```
+
+2. **Dari MENGHINDARI_HALANGAN ke MENCARI_GARIS**: Terjadi ketika manuver hindari halangan selesai.
+   ```cpp
+   case 6: // Selesai, masuk mode cari garis
+     currentState = MENCARI_GARIS;
+     // ...
+     break;
+   ```
+
+3. **Dari MENCARI_GARIS ke MENENGAHKAN_POSISI**: Terjadi ketika robot menemukan garis kembali.
+   ```cpp
+   if (digitalRead(PIN_IR_KIRI) == GARIS_HITAM || digitalRead(PIN_IR_KANAN) == GARIS_HITAM) {
+     currentState = MENENGAHKAN_POSISI;
+     // ...
+   }
+   ```
+
+4. **Dari MENENGAHKAN_POSISI ke MENGIKUTI_GARIS**: Terjadi ketika robot sudah berada pada posisi yang tepat di atas garis.
+   ```cpp
+   else {
+     // Keduanya sudah di putih, berarti sudah pas di tengah
+     currentState = MENGIKUTI_GARIS;
+     // ...
+   }
+   ```
+
+### Manfaat Versi Kompleks
+
+1. **Lebih Responsif**: Robot dapat merespons perubahan lingkungan bahkan saat sedang melakukan manuver.
+2. **Lebih Mudah Didebug**: Dengan state machine, lebih mudah mengetahui di mana masalah terjadi.
+3. **Lebih Fleksibel**: Manuver bisa disesuaikan tanpa mengubah keseluruhan logika program.
+4. **Lebih Scalable**: Mudah untuk menambahkan fitur atau perilaku baru.
+
+Berikut adalah kode lengkap untuk versi kompleks:
+
+```cpp
+// ==== PENGATURAN PIN ====
+#define ENA 10
+#define IN1 9
+#define IN2 8
+#define ENB 5
+#define IN3 7
+#define IN4 6
+#define TRIG_PIN A3
+#define ECHO_PIN A2
+#define PIN_IR_KANAN 11
+#define PIN_IR_KIRI  12
+#define PIN_LED_MERAH 2
+#define PIN_LED_KUNING 3
+#define PIN_LED_HIJAU 4
+
+#define GARIS_HITAM HIGH
+#define DASAR_PUTIH LOW
+
+// --- Pengaturan Kecepatan ---
+const int KECEPATAN_MAJU_NORMAL = 120;
+const int KECEPATAN_BELOK = 100;
+const int KECEPATAN_CARI = 80;
+const int KECEPATAN_PUTAR_HINDAR = 100;
+
+const int JARAK_AMAN_CM = 20;
+
+// --- Durasi Manuver ---
+const int WAKTU_PUTAR_90_DERAJAT = 650; 
+const int WAKTU_MAJU_SAMPING = 500;
+const int WAKTU_MAJU_LEWATI = 700;
+const int WAKTU_JEDA_ANTAR_MANUVER = 200;
+
+const int WAKTU_MAJU_CARI = 200;    // Maju sedikit di setiap langkah cari
+const int WAKTU_PUTAR_CARI = 40;   // Putar sedikit untuk mencari
+
+// Mendefinisikan state (status) yang bisa dimiliki robot
+enum RobotState {
+  MENGIKUTI_GARIS,
+  MENGHINDARI_HALANGAN,
+  MENCARI_GARIS,
+  MENENGAHKAN_POSISI
+};
+
+RobotState currentState = MENGIKUTI_GARIS;
+
+unsigned long stateStartTime = 0;
+int manuverStep = 0;
+bool belokKiriTerakhir = true;
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(ENB, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+  pinMode(PIN_LED_MERAH, OUTPUT); pinMode(PIN_LED_KUNING, OUTPUT); pinMode(PIN_LED_HIJAU, OUTPUT);
+  pinMode(PIN_IR_KANAN, INPUT); pinMode(PIN_IR_KIRI, INPUT);
+  pinMode(TRIG_PIN, OUTPUT); pinMode(ECHO_PIN, INPUT);
+  
+  Serial.println("Robot Cerdas Siap!");
+  berhenti();
+  delay(500);
+}
+
+void loop() {
+  // Pengecekan halangan menjadi prioritas utama untuk mengubah state
+  long jarak = ukurJarakCm();
+  if (jarak <= JARAK_AMAN_CM && jarak > 0 && currentState == MENGIKUTI_GARIS) {
+    currentState = MENGHINDARI_HALANGAN;
+    manuverStep = 0;
+    stateStartTime = millis();
+    berhenti();
+    Serial.println("State -> MENGHINDARI_HALANGAN");
+  }
+
+  switch (currentState) {
+    case MENGIKUTI_GARIS:
+      ikutiGaris();
+      break;
+    case MENGHINDARI_HALANGAN:
+      hindariHalangan_nonBlocking();
+      break;
+    case MENCARI_GARIS:
+      cariGaris_nonBlocking();
+      break;
+    case MENENGAHKAN_POSISI:
+      tengahkanPosisi_nonBlocking();
+      break;
+  }
+}
+
+void ikutiGaris() {
+  bool sensorKiri = (digitalRead(PIN_IR_KIRI) == GARIS_HITAM);
+  bool sensorKanan = (digitalRead(PIN_IR_KANAN) == GARIS_HITAM);
+
+  if (!sensorKiri && !sensorKanan) { // Keduanya di putih
+    maju(KECEPATAN_MAJU_NORMAL);
+  } 
+  else if (sensorKiri && !sensorKanan) { // Kiri di hitam, belok kiri
+    putarKiri(KECEPATAN_BELOK);
+  } 
+  else if (!sensorKiri && sensorKanan) { // Kanan di hitam, belok kanan
+    putarKanan(KECEPATAN_BELOK);
+  } 
+  else { // Keduanya di hitam
+    berhenti();
+  }
+}
+
+void hindariHalangan_nonBlocking() {
+  unsigned long currentTime = millis();
+
+  switch (manuverStep) {
+    case 0: // Jeda awal
+      if (currentTime - stateStartTime >= WAKTU_JEDA_ANTAR_MANUVER) { manuverStep++; stateStartTime = currentTime; }
+      else { berhenti(); }
+      break;
+    case 1: // Putar Kanan
+      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKanan(KECEPATAN_PUTAR_HINDAR); } 
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 2: // Maju Samping
+      if (currentTime - stateStartTime < WAKTU_MAJU_SAMPING) { maju(KECEPATAN_MAJU_NORMAL); }
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 3: // Putar Kiri
+      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKiri(KECEPATAN_PUTAR_HINDAR); }
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 4: // Maju Lewati
+      if (currentTime - stateStartTime < WAKTU_MAJU_LEWATI) { maju(KECEPATAN_MAJU_NORMAL); }
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 5: // Putar Kiri lagi
+      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKiri(KECEPATAN_PUTAR_HINDAR); }
+      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
+      break;
+    case 6: // Selesai, masuk mode cari garis
+      currentState = MENCARI_GARIS;
+      Serial.println("State -> MENCARI_GARIS");
+      break;
+  }
+}
+
+void cariGaris_nonBlocking() {
+  unsigned long currentTime = millis();
+
+  // Prioritas utama: jika garis terdeteksi, langsung masuk ke mode penengahan
+  if (digitalRead(PIN_IR_KIRI) == GARIS_HITAM || digitalRead(PIN_IR_KANAN) == GARIS_HITAM) {
+    Serial.println("Garis ditemukan!");
+    currentState = MENENGAHKAN_POSISI;
+    stateStartTime = millis();
+    berhenti();
+    Serial.println("State -> MENENGAHKAN_POSISI");
+    return;
+  }
+  
+  if (currentTime - stateStartTime >= WAKTU_MAJU_CARI + WAKTU_PUTAR_CARI) {
+    stateStartTime = currentTime;
+    belokKiriTerakhir = !belokKiriTerakhir; // Balik arah putaran
+  }
+  
+  // Lakukan gerakan berdasarkan waktu
+  if (currentTime - stateStartTime < WAKTU_MAJU_CARI) {
+    // Fase maju
+    maju(KECEPATAN_CARI);
+  } 
+  else {
+    // Fase putar
+    if (belokKiriTerakhir) {
+      putarKiri(KECEPATAN_CARI);
+    } 
+    else {
+      putarKanan(KECEPATAN_CARI);
+    }
+  }
+}
+
+void tengahkanPosisi_nonBlocking() {
+  bool sensorKiri = (digitalRead(PIN_IR_KIRI) == GARIS_HITAM);
+  bool sensorKanan = (digitalRead(PIN_IR_KANAN) == GARIS_HITAM);
+
+  if (sensorKiri && sensorKanan) {
+    // Keduanya di hitam, putar kiri sampai kiri lepas
+    putarKiri(KECEPATAN_CARI);
+  } 
+  else if (sensorKiri && !sensorKanan) {
+    // Kiri di hitam, putar kiri sampai lepas
+    putarKiri(KECEPATAN_CARI);
+  }
+  else if (!sensorKiri && sensorKanan) {
+    // Kanan di hitam, putar kanan sampai lepas
+    putarKanan(KECEPATAN_CARI);
+  }
+  else {
+    // Keduanya sudah di putih, berarti sudah pas di tengah
+    berhenti();
+    Serial.println("Posisi sudah di tengah.");
+    currentState = MENGIKUTI_GARIS;
+    Serial.println("State -> MENGIKUTI_GARIS");
+  }
+}
+
+long ukurJarakCm() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+  long durasi = pulseIn(ECHO_PIN, HIGH, 25000); 
+  return durasi * 0.034 / 2;
+}
+
+// --- Fungsi Kontrol Motor Dasar ---
+void maju(int kecepatan) {
+  digitalWrite(PIN_LED_HIJAU, HIGH); digitalWrite(PIN_LED_KUNING, LOW); digitalWrite(PIN_LED_MERAH, LOW);
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+  analogWrite(ENA, kecepatan); analogWrite(ENB, kecepatan);
+}
+
+void putarKanan(int kecepatan) {
+  digitalWrite(PIN_LED_HIJAU, LOW); digitalWrite(PIN_LED_KUNING, HIGH); digitalWrite(PIN_LED_MERAH, LOW);
+  digitalWrite(IN1, LOW); digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
+  analogWrite(ENA, kecepatan); analogWrite(ENB, kecepatan);
+}
+
+void putarKiri(int kecepatan) {
+  digitalWrite(PIN_LED_HIJAU, LOW); digitalWrite(PIN_LED_KUNING, HIGH); digitalWrite(PIN_LED_MERAH, LOW);
+  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, HIGH);
+  analogWrite(ENA, kecepatan); analogWrite(ENB, kecepatan);
+}
+
+void berhenti() {
+  digitalWrite(PIN_LED_HIJAU, LOW); digitalWrite(PIN_LED_KUNING, LOW); digitalWrite(PIN_LED_MERAH, HIGH);
+  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
+  analogWrite(ENA, 0); analogWrite(ENB, 0);
+}
+```
+
+### Penjelasan Kode
+- **State Machine**: Mengelola status robot (mengikuti garis, menghindari halangan, mencari garis, menengahkan posisi) dengan lebih terstruktur.
+- **Non-Blocking**: Menggunakan `millis()` untuk mengatur waktu tanpa menghentikan eksekusi kode, sehingga robot tetap responsif.
+- **Pencarian Zig-Zag**: Algoritma pencarian garis yang lebih efisien dengan pola zig-zag.
+
+> Notes: Beberapa Code dan Program diatas merupakan salah satu contoh saja, silahkan kembangkan dan kreasikan sesuai kebutuhan.
+> 
+> Selamat Berkarya dan Bereksplorasi,
+> 
+> Sukses Selalu!

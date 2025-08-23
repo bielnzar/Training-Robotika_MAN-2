@@ -13,7 +13,7 @@ Berikut adalah daftar materi yang akan kita pelajari. Klik link untuk mengakses 
 | 🚀 Dasar Bahasa C | [Lihat Wiki](https://github.com/bielnzar/Training-Robotika_MAN-2/wiki) |
 | ⚙️ Prepare Environment | [Persiapan Sebelum Ngoding](https://github.com/bielnzar/Training-Robotika_MAN-2/blob/main/Prepare_Environment/README.md) |
 | 👀 Sensor & Komponen | [Pengenalan Sensor & Komponen](https://github.com/bielnzar/Training-Robotika_MAN-2/blob/main/Belajar_Sensor/README.md) |
-
+| 🚑 Program Robot | [Kumpulan Coding](https://github.com/bielnzar/Training-Robotika_MAN-2/blob/main/Program_Robot/README.md) |
 ---
 
 ## 📞 Kontak
@@ -26,3 +26,4 @@ Jika ada kritik saran maupun pertanyaan, silahkan menghubungi:
 
 > "The best way to predict the future is to invent it." - Alan Kay
 
+> Salam Hangat Kakak-Kakak ITS Surabaya☺️
