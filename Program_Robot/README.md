@@ -506,7 +506,6 @@ void loop() {
   long jarak = ukurJarakCm();
 
   // 2. Tampilkan jarak di Serial Monitor untuk debugging
-  // Ini sangat membantu untuk memastikan sensor bekerja dengan benar
   Serial.print("Jarak di depan: ");
   Serial.print(jarak);
   Serial.println(" cm");
@@ -848,183 +847,146 @@ int kecepatanCariGaris = 60;
 const int WAKTU_PUTAR_90_DERAJAT = 700;
 const int WAKTU_MAJU_SAMPING = 600;
 const int WAKTU_MAJU_LEWATI_HALANGAN = 600;
-const int WAKTU_PUTAR_CARI = 700;
 
-// --- Durasi Pencarian Garis ---
+// === Pengaturan Pencarian Garis ===
 const int LANGKAH_MAKSIMAL_CARI = 20;
 const int WAKTU_PER_POTONGAN = 10;          // DISARANKAN: 10ms agar gerakan lebih stabil
 const int JUMLAH_POTONGAN_MAJU = 200;        // Lakukan 200 potongan (10ms * 200 = 2000ms = 2.0 detik)
-
-// Mendefinisikan state (status) yang bisa dimiliki robot
-enum RobotState {
-  MENGIKUTI_GARIS,
-  MENGHINDARI_HALANGAN,
-  MENCARI_GARIS,
-  MENENGAHKAN_POSISI
-};
-
-// Variabel global untuk menyimpan state saat ini
-RobotState currentState = MENGIKUTI_GARIS;
-
-// Variabel untuk manajemen state dan waktu
-unsigned long stateStartTime = 0; // Waktu kapan state saat ini dimulai
-int manuverStep = 0;              // Langkah ke berapa dalam sebuah manuver
-bool belokKiriTerakhir = true;    // Untuk bolak-balik arah saat mencari garis
+const int WAKTU_PUTAR_CARI = 700;
 
 void setup() {
   Serial.begin(9600);
-
   pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
   pinMode(ENB, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
   pinMode(PIN_LED_MERAH, OUTPUT); pinMode(PIN_LED_KUNING, OUTPUT); pinMode(PIN_LED_HIJAU, OUTPUT);
   pinMode(PIN_IR_KANAN, INPUT); pinMode(PIN_IR_KIRI, INPUT);
   pinMode(TRIG_PIN, OUTPUT); pinMode(ECHO_PIN, INPUT);
   
-  Serial.println("Robot Cerdas (State Machine) Siap!");
+  Serial.println("Robot Cerdas Siap!");
   berhenti();
-  delay(500);
+  delay(1000);
 }
 
 void loop() {
-  // Pengecekan halangan menjadi prioritas utama untuk mengubah state.
-  // Hanya bisa diinterupsi jika sedang mengikuti garis.
   long jarak = ukurJarakCm();
-  if (jarak <= JARAK_AMAN_CM && jarak > 0 && currentState == MENGIKUTI_GARIS) {
-    // Transisi state ke MENGHINDARI_HALANGAN
-    currentState = MENGHINDARI_HALANGAN;
-    manuverStep = 0;           // Reset langkah manuver
-    stateStartTime = millis(); // Catat waktu mulai manuver
-    berhenti();
-    Serial.println("State -> MENGHINDARI_HALANGAN");
-  }
-
-  // Jalankan fungsi yang sesuai dengan state saat ini
-  switch (currentState) {
-    case MENGIKUTI_GARIS:
-      ikutiGaris();
-      break;
-    case MENGHINDARI_HALANGAN:
-      hindariHalangan_nonBlocking();
-      break;
-    case MENCARI_GARIS:
-      cariGaris_nonBlocking();
-      break;
-    case MENENGAHKAN_POSISI:
-      tengahkanPosisi_nonBlocking();
-      break;
+  if (jarak <= jarakAman && jarak > 0) {
+    hindariHalangan();
+  } 
+  else {
+    ikutiGaris();
   }
 }
 
 void ikutiGaris() {
-  // Fungsi ini tetap sama, karena ia reaktif dan tidak butuh delay
-  bool sensorKiri = (digitalRead(PIN_IR_KIRI) == GARIS_HITAM);
-  bool sensorKanan = (digitalRead(PIN_IR_KANAN) == GARIS_HITAM);
-
-  if (!sensorKiri && !sensorKanan) { // Keduanya di putih
-    maju(KECEPATAN_MAJU_NORMAL);
+  int nilaiSensorKiri = digitalRead(PIN_IR_KIRI);
+  int nilaiSensorKanan = digitalRead(PIN_IR_KANAN);
+  
+  if (nilaiSensorKiri == LOW && nilaiSensorKanan == LOW) {
+    maju(kecepatanMajuFollower);
   } 
-  else if (sensorKiri && !sensorKanan) { // Kiri di hitam, belok kiri
-    putarKiri(KECEPATAN_BELOK);
+  else if (nilaiSensorKiri == HIGH && nilaiSensorKanan == LOW) {
+    putarKiri(kecepatanBelokFollower);
   } 
-  else if (!sensorKiri && sensorKanan) { // Kanan di hitam, belok kanan
-    putarKanan(KECEPATAN_BELOK);
+  else if (nilaiSensorKiri == LOW && nilaiSensorKanan == HIGH) {
+    putarKanan(kecepatanBelokFollower);
   } 
-  else { // Keduanya di hitam
+  else if (nilaiSensorKiri == HIGH && nilaiSensorKanan == HIGH){
     berhenti();
   }
 }
 
-void hindariHalangan_nonBlocking() {
-  unsigned long currentTime = millis();
-
-  // Manuver ini dibagi menjadi beberapa langkah (step)
-  switch (manuverStep) {
-    case 0: // Jeda awal
-      if (currentTime - stateStartTime >= WAKTU_JEDA_ANTAR_MANUVER) { manuverStep++; stateStartTime = currentTime; }
-      else { berhenti(); }
-      break;
-    case 1: // Putar Kanan
-      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKanan(KECEPATAN_PUTAR_HINDAR); } 
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 2: // Maju Samping
-      if (currentTime - stateStartTime < WAKTU_MAJU_SAMPING) { maju(KECEPATAN_MAJU_NORMAL); }
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 3: // Putar Kiri
-      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKiri(KECEPATAN_PUTAR_HINDAR); }
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 4: // Maju Lewati
-      if (currentTime - stateStartTime < WAKTU_MAJU_LEWATI) { maju(KECEPATAN_MAJU_NORMAL); }
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 5: // Putar Kiri lagi
-      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKiri(KECEPATAN_PUTAR_HINDAR); }
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 6: // Selesai, transisi ke state cari garis
-      currentState = MENCARI_GARIS;
-      Serial.println("State -> MENCARI_GARIS");
-      break;
-  }
+void hindariHalangan() {
+  Serial.println("Mode: HINDARI HALANGAN!");
+  berhenti(); delay(500);
+  putarKanan(kecepatanPutarObstacle); delay(WAKTU_PUTAR_90_DERAJAT);
+  berhenti(); delay(500);
+  maju(kecepatanMajuObstacle); delay(WAKTU_MAJU_SAMPING);
+  berhenti(); delay(500);
+  putarKiri(kecepatanPutarObstacle); delay(WAKTU_PUTAR_90_DERAJAT);
+  berhenti(); delay(500);
+  maju(kecepatanMajuObstacle); delay(WAKTU_MAJU_LEWATI_HALANGAN);
+  berhenti(); delay(500);
+  putarKiri(kecepatanPutarObstacle); delay(WAKTU_PUTAR_90_DERAJAT);
+  berhenti(); delay(500);
+  
+  modeCariGaris(); 
 }
 
-void cariGaris_nonBlocking() {
-  unsigned long currentTime = millis();
+void modeCariGaris() {
+  Serial.println("Mode: MENCARI GARIS");
+  
+  for (int i = 1; i <= LANGKAH_MAKSIMAL_CARI; i++) {
+    Serial.print("Memulai langkah pencarian ke-");
+    Serial.println(i);
 
-  // Prioritas utama: jika garis terdeteksi, langsung transisi state
-  if (digitalRead(PIN_IR_KIRI) == GARIS_HITAM || digitalRead(PIN_IR_KANAN) == GARIS_HITAM) {
-    Serial.println("Garis ditemukan!");
-    currentState = MENENGAHKAN_POSISI;
-    stateStartTime = millis();
+    Serial.println(" -> Maju sambil menscan...");
+    bool garisDitemukan = false;
+    for (int j = 0; j < JUMLAH_POTONGAN_MAJU; j++) {
+      maju(kecepatanCariGaris);
+      delay(WAKTU_PER_POTONGAN);
+
+      if (digitalRead(PIN_IR_KIRI) == HIGH || digitalRead(PIN_IR_KANAN) == HIGH) {
+        garisDitemukan = true;
+        break; 
+      }
+    }
+
+    if (garisDitemukan == true) {
+      Serial.println("Garis ditemukan saat bergerak maju!");
+      tengahkanPosisiPadaGaris();
+      return;
+    }
+
     berhenti();
-    Serial.println("State -> MENENGAHKAN_POSISI");
-    return; // Keluar dari fungsi agar tidak menjalankan kode di bawah
+    delay(200);
+    Serial.println("  -> Garis tidak ditemukan, melakukan putaran...");
+    putarKiri(kecepatanPutarObstacle);
+    delay(WAKTU_PUTAR_CARI);
+    berhenti();
+    delay(200);
   }
-  
-  // Logika untuk maju-putar-maju-putar
-  if (currentTime - stateStartTime >= WAKTU_MAJU_CARI + WAKTU_PUTAR_CARI) {
-    stateStartTime = currentTime; // Reset timer untuk siklus baru
-    belokKiriTerakhir = !belokKiriTerakhir; // Balik arah putaran setiap siklus
-  }
-  
-  if (currentTime - stateStartTime < WAKTU_MAJU_CARI) {
-    maju(KECEPATAN_CARI);
-  } 
-  else {
-    if (belokKiriTerakhir) { putarKiri(KECEPATAN_CARI); } 
-    else { putarKanan(KECEPATAN_CARI); }
-  }
+
+  Serial.println("PENCARIAN GAGAL setelah mencoba semua langkah. Robot berhenti.");
 }
 
-void tengahkanPosisi_nonBlocking() {
-  bool sensorKiri = (digitalRead(PIN_IR_KIRI) == GARIS_HITAM);
-  bool sensorKanan = (digitalRead(PIN_IR_KANAN) == GARIS_HITAM);
 
-  if (sensorKiri || sensorKanan) {
-    // Jika salah satu atau kedua sensor masih di garis hitam, terus berputar
-    if (sensorKiri) {
-      putarKiri(KECEPATAN_CARI);
-    } else { // sensorKanan pasti true di sini
-      putarKanan(KECEPATAN_CARI);
+void tengahkanPosisiPadaGaris(){
+  Serial.println("Memulai manuver penengahan garis...");
+  berhenti();
+  delay(100);
+
+  // Prioritas 1: Tangani kasus kedua sensor di garis hitam
+  if (digitalRead(PIN_IR_KIRI) == HIGH && digitalRead(PIN_IR_KANAN) == HIGH) {
+    Serial.println("Garis lebar terdeteksi. Memutar untuk mencari tepi...");
+    // Putar sampai sensor KIRI menemukan tepi putih
+    while(digitalRead(PIN_IR_KIRI) == HIGH) { 
+      putarKiri(kecepatanCariGaris);
+    }
+  } 
+  // Prioritas 2: Tangani kasus normal (salah satu sensor)
+  else if (digitalRead(PIN_IR_KIRI) == HIGH) {
+    Serial.println("Garis di KIRI. Menyejajarkan...");
+    while(digitalRead(PIN_IR_KIRI) == HIGH){
+      putarKiri(kecepatanCariGaris);
+    }
+  } 
+  else if (digitalRead(PIN_IR_KANAN) == HIGH) {
+    Serial.println("Garis di KANAN. Menyejajarkan...");
+    while(digitalRead(PIN_IR_KANAN) == HIGH){
+      putarKanan(kecepatanCariGaris);
     }
   }
-  else {
-    // Keduanya sudah di putih, berarti sudah pas di tengah. Selesai.
-    berhenti();
-    Serial.println("Posisi sudah di tengah.");
-    currentState = MENGIKUTI_GARIS; // Transisi kembali ke state normal
-    Serial.println("State -> MENGIKUTI_GARIS");
-  }
+  
+  Serial.println("Robot seharusnya sudah sejajar. Kembali ke mode normal.");
+  berhenti();
+  delay(500);
 }
 
-// --- Fungsi Utilitas dan Kontrol Motor Dasar ---
 long ukurJarakCm() {
   digitalWrite(TRIG_PIN, LOW); delayMicroseconds(2);
   digitalWrite(TRIG_PIN, HIGH); delayMicroseconds(10);
   digitalWrite(TRIG_PIN, LOW);
-  long durasi = pulseIn(ECHO_PIN, HIGH, 25000); 
+  long durasi = pulseIn(ECHO_PIN, HIGH, 25000);
   return durasi * 0.034 / 2;
 }
 
@@ -1059,286 +1021,8 @@ void berhenti() {
 
 ### Penjelasan Kode dan Kalibrasi
 - **`void loop()`**: Sangat bersih dan efisien. Hanya ada `if-else` untuk memilih antara `hindariHalangan()` atau `ikutiGaris()`. Ini menunjukkan prioritas yang jelas: keamanan (menghindari tabrakan) adalah nomor satu.
-- **`hindariHalangan_nonBlocking()`**: Fungsi ini seperti sebuah "skrip" gerakan. Ia menjalankan serangkaian perintah maju, putar, dan berhenti dengan durasi (`delay`) yang sudah ditentukan. **PENTING:** Nilai `WAKTU_PUTAR_90_DERAJAT`, `WAKTU_MAJU_SAMPING`, dll., sangat bergantung pada kecepatan motor, voltase baterai, dan permukaan lantai. Anda **harus** mengkalibrasi nilai-nilai ini agar robot bisa bermanuver dengan mulus.
-- **`cariGaris_nonBlocking()`**: Ini adalah logika pencarian yang cukup tangguh. Ia mencoba maju, lalu berputar, berulang kali. Jika robot Anda kesulitan menemukan garis, Anda bisa mengubah `LANGKAH_MAKSIMAL_CARI` atau `WAKTU_PUTAR_CARI`.
-- **`tengahkanPosisi_nonBlocking()`**: Setelah garis ditemukan, fungsi ini memastikan robot berada di posisi yang benar sebelum kembali ke mode `ikutiGaris`. Ia akan memutar sedikit sampai kedua sensor tidak lagi melihat garis hitam, menempatkan robot tepat di tengah.
+- **`hindariHalangan()`**: Fungsi ini seperti sebuah "skrip" gerakan. Ia menjalankan serangkaian perintah maju, putar, dan berhenti dengan durasi (`delay`) yang sudah ditentukan. **PENTING:** Nilai `WAKTU_PUTAR_90_DERAJAT`, `WAKTU_MAJU_SAMPING`, dll., sangat bergantung pada kecepatan motor, voltase baterai, dan permukaan lantai. Anda **harus** mengkalibrasi nilai-nilai ini agar robot bisa bermanuver dengan mulus.
+- **`modeCariGaris()`**: Ini adalah logika pencarian yang cukup tangguh. Ia mencoba maju, lalu berputar, berulang kali. Jika robot Anda kesulitan menemukan garis, Anda bisa mengubah `LANGKAH_MAKSIMAL_CARI` atau `WAKTU_PUTAR_CARI`.
+- **`tengahkanPosisiPadaGaris()`**: Setelah garis ditemukan, fungsi ini memastikan robot berada di posisi yang benar sebelum kembali ke mode `ikutiGaris`. Ia akan memutar sedikit sampai kedua sensor tidak lagi melihat garis hitam, menempatkan robot tepat di tengah.
 - **Fungsi Gerak dengan Parameter**: Perhatikan fungsi `maju()`, `putarKiri()`, dan `putarKanan()` sekarang menerima parameter `int kecepatan`. Ini membuat kode lebih fleksibel karena kita bisa memanggil fungsi yang sama dengan kecepatan yang berbeda-beda tergantung situasinya (misal: lebih lambat saat mencari garis, lebih cepat saat mengikuti garis lurus).
-
----
-
-## Materi 7: Robot Cerdas dengan State Machine (Versi Lanjutan)
-
-Selamat datang di materi puncak! Di sini kita akan membangun ulang logika dari materi sebelumnya menggunakan pendekatan yang jauh lebih canggih, fleksibel, dan kuat: sebuah **State Machine** (Mesin Status) dengan **kode non-blocking**. Ini adalah cara yang digunakan dalam sistem robotika dan embedded yang lebih serius.
-
-### Masalah dengan Pendekatan `delay()`
-Pada versi sebelumnya, kita menggunakan `delay()` untuk mengatur durasi setiap gerakan. `delay()` memiliki kelemahan besar: ia **memblokir** mikrokontroler. Saat `delay(1000)` berjalan, Arduino tidak bisa melakukan apa-apa lagi selama 1 detik—tidak bisa membaca sensor, tidak bisa merespons perintah, ia benar-benar "tertidur". Ini membuat robot tidak responsif.
-
-### Solusi: State Machine dan `millis()`
-**1. State Machine:**
-Bayangkan robot hanya bisa berada dalam satu "mode" atau "status" (`state`) pada satu waktu. Misalnya:
-- `MENGIKUTI_GARIS`: Mode normal.
-- `MENGHINDARI_HALANGAN`: Mode saat ada rintangan.
-- `MENCARI_GARIS`: Mode setelah menghindari rintangan.
-- `MENENGAHKAN_POSISI`: Mode untuk mensejajarkan diri di garis.
-
-Robot akan berpindah dari satu state ke state lain berdasarkan input sensor. Pendekatan ini membuat logika program sangat terstruktur dan mudah dikelola.
-
-**2. Kode Non-Blocking dengan `millis()`:**
-`millis()` adalah fungsi internal Arduino yang mengembalikan jumlah milidetik sejak program dimulai. Kita bisa menggunakannya untuk mengukur waktu tanpa menghentikan program.
-
-Logikanya seperti ini:
-- Catat waktu mulai (`stateStartTime = millis();`).
-- Di dalam `loop()`, terus periksa `if (millis() - stateStartTime >= durasiYangDiinginkan)`.
-- Jika kondisi terpenuhi, artinya waktu yang diinginkan telah berlalu. Lakukan aksi berikutnya dan catat waktu mulai yang baru.
-
-Dengan cara ini, `loop()` terus berjalan ratusan kali per detik, memungkinkan robot untuk terus membaca sensor dan merespons dengan cepat bahkan saat sedang "menunggu".
-
-### Kode Lengkap Versi State Machine
-
-```cpp
-// ==== PENGATURAN PIN DAN KONSTANTA ====
-#define ENA 10
-#define IN1 9
-#define IN2 8
-#define ENB 5
-#define IN3 7
-#define IN4 6
-#define TRIG_PIN A3
-#define ECHO_PIN A2
-#define PIN_IR_KANAN 11
-#define PIN_IR_KIRI  12
-#define PIN_LED_MERAH 2
-#define PIN_LED_KUNING 3
-#define PIN_LED_HIJAU 4
-
-// Definisi untuk pembacaan sensor IR agar lebih mudah dibaca
-#define GARIS_HITAM HIGH
-#define DASAR_PUTIH LOW
-
-// --- Pengaturan Kecepatan ---
-const int KECEPATAN_MAJU_NORMAL = 120;
-const int KECEPATAN_BELOK = 100;
-const int KECEPATAN_CARI = 80;
-const int KECEPATAN_PUTAR_HINDAR = 100;
-
-// --- Pengaturan Logika ---
-const int JARAK_AMAN_CM = 20;
-
-// --- Durasi Manuver (untuk millis()) ---
-const int WAKTU_PUTAR_90_DERAJAT = 650; 
-const int WAKTU_MAJU_SAMPING = 500;
-const int WAKTU_MAJU_LEWATI = 700;
-const int WAKTU_JEDA_ANTAR_MANUVER = 200;
-
-// --- Durasi Pencarian Garis ---
-const int WAKTU_MAJU_CARI = 200;    // Maju sedikit di setiap langkah cari
-const int WAKTU_PUTAR_CARI = 40;   // Putar sedikit untuk mencari
-
-// Mendefinisikan state (status) yang bisa dimiliki robot
-enum RobotState {
-  MENGIKUTI_GARIS,
-  MENGHINDARI_HALANGAN,
-  MENCARI_GARIS,
-  MENENGAHKAN_POSISI
-};
-
-// Variabel global untuk menyimpan state saat ini
-RobotState currentState = MENGIKUTI_GARIS;
-
-// Variabel untuk manajemen state dan waktu
-unsigned long stateStartTime = 0; // Waktu kapan state saat ini dimulai
-int manuverStep = 0;              // Langkah ke berapa dalam sebuah manuver
-bool belokKiriTerakhir = true;    // Untuk bolak-balik arah saat mencari garis
-
-void setup() {
-  Serial.begin(9600);
-
-  pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
-  pinMode(ENB, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
-  pinMode(PIN_LED_MERAH, OUTPUT); pinMode(PIN_LED_KUNING, OUTPUT); pinMode(PIN_LED_HIJAU, OUTPUT);
-  pinMode(PIN_IR_KANAN, INPUT); pinMode(PIN_IR_KIRI, INPUT);
-  pinMode(TRIG_PIN, OUTPUT); pinMode(ECHO_PIN, INPUT);
-  
-  Serial.println("Robot Cerdas (State Machine) Siap!");
-  berhenti();
-  delay(500);
-}
-
-void loop() {
-  // Pengecekan halangan menjadi prioritas utama untuk mengubah state.
-  // Hanya bisa diinterupsi jika sedang mengikuti garis.
-  long jarak = ukurJarakCm();
-  if (jarak <= JARAK_AMAN_CM && jarak > 0 && currentState == MENGIKUTI_GARIS) {
-    // Transisi state ke MENGHINDARI_HALANGAN
-    currentState = MENGHINDARI_HALANGAN;
-    manuverStep = 0;           // Reset langkah manuver
-    stateStartTime = millis(); // Catat waktu mulai manuver
-    berhenti();
-    Serial.println("State -> MENGHINDARI_HALANGAN");
-  }
-
-  // Jalankan fungsi yang sesuai dengan state saat ini
-  switch (currentState) {
-    case MENGIKUTI_GARIS:
-      ikutiGaris();
-      break;
-    case MENGHINDARI_HALANGAN:
-      hindariHalangan_nonBlocking();
-      break;
-    case MENCARI_GARIS:
-      cariGaris_nonBlocking();
-      break;
-    case MENENGAHKAN_POSISI:
-      tengahkanPosisi_nonBlocking();
-      break;
-  }
-}
-
-void ikutiGaris() {
-  // Fungsi ini tetap sama, karena ia reaktif dan tidak butuh delay
-  bool sensorKiri = (digitalRead(PIN_IR_KIRI) == GARIS_HITAM);
-  bool sensorKanan = (digitalRead(PIN_IR_KANAN) == GARIS_HITAM);
-
-  if (!sensorKiri && !sensorKanan) { // Keduanya di putih
-    maju(KECEPATAN_MAJU_NORMAL);
-  } 
-  else if (sensorKiri && !sensorKanan) { // Kiri di hitam, belok kiri
-    putarKiri(KECEPATAN_BELOK);
-  } 
-  else if (!sensorKiri && sensorKanan) { // Kanan di hitam, belok kanan
-    putarKanan(KECEPATAN_BELOK);
-  } 
-  else { // Keduanya di hitam
-    berhenti();
-  }
-}
-
-void hindariHalangan_nonBlocking() {
-  unsigned long currentTime = millis();
-
-  // Manuver ini dibagi menjadi beberapa langkah (step)
-  switch (manuverStep) {
-    case 0: // Jeda awal
-      if (currentTime - stateStartTime >= WAKTU_JEDA_ANTAR_MANUVER) { manuverStep++; stateStartTime = currentTime; }
-      else { berhenti(); }
-      break;
-    case 1: // Putar Kanan
-      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKanan(KECEPATAN_PUTAR_HINDAR); } 
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 2: // Maju Samping
-      if (currentTime - stateStartTime < WAKTU_MAJU_SAMPING) { maju(KECEPATAN_MAJU_NORMAL); }
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 3: // Putar Kiri
-      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKiri(KECEPATAN_PUTAR_HINDAR); }
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 4: // Maju Lewati
-      if (currentTime - stateStartTime < WAKTU_MAJU_LEWATI) { maju(KECEPATAN_MAJU_NORMAL); }
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 5: // Putar Kiri lagi
-      if (currentTime - stateStartTime < WAKTU_PUTAR_90_DERAJAT) { putarKiri(KECEPATAN_PUTAR_HINDAR); }
-      else { manuverStep++; stateStartTime = currentTime; berhenti(); }
-      break;
-    case 6: // Selesai, transisi ke state cari garis
-      currentState = MENCARI_GARIS;
-      Serial.println("State -> MENCARI_GARIS");
-      break;
-  }
-}
-
-void cariGaris_nonBlocking() {
-  unsigned long currentTime = millis();
-
-  // Prioritas utama: jika garis terdeteksi, langsung transisi state
-  if (digitalRead(PIN_IR_KIRI) == GARIS_HITAM || digitalRead(PIN_IR_KANAN) == GARIS_HITAM) {
-    Serial.println("Garis ditemukan!");
-    currentState = MENENGAHKAN_POSISI;
-    stateStartTime = millis();
-    berhenti();
-    Serial.println("State -> MENENGAHKAN_POSISI");
-    return; // Keluar dari fungsi agar tidak menjalankan kode di bawah
-  }
-  
-  // Logika untuk maju-putar-maju-putar
-  if (currentTime - stateStartTime >= WAKTU_MAJU_CARI + WAKTU_PUTAR_CARI) {
-    stateStartTime = currentTime; // Reset timer untuk siklus baru
-    belokKiriTerakhir = !belokKiriTerakhir; // Balik arah putaran setiap siklus
-  }
-  
-  if (currentTime - stateStartTime < WAKTU_MAJU_CARI) {
-    maju(KECEPATAN_CARI);
-  } 
-  else {
-    if (belokKiriTerakhir) { putarKiri(KECEPATAN_CARI); } 
-    else { putarKanan(KECEPATAN_CARI); }
-  }
-}
-
-void tengahkanPosisi_nonBlocking() {
-  bool sensorKiri = (digitalRead(PIN_IR_KIRI) == GARIS_HITAM);
-  bool sensorKanan = (digitalRead(PIN_IR_KANAN) == GARIS_HITAM);
-
-  if (sensorKiri || sensorKanan) {
-    // Jika salah satu atau kedua sensor masih di garis hitam, terus berputar
-    if (sensorKiri) {
-      putarKiri(KECEPATAN_CARI);
-    } else { // sensorKanan pasti true di sini
-      putarKanan(KECEPATAN_CARI);
-    }
-  }
-  else {
-    // Keduanya sudah di putih, berarti sudah pas di tengah. Selesai.
-    berhenti();
-    Serial.println("Posisi sudah di tengah.");
-    currentState = MENGIKUTI_GARIS; // Transisi kembali ke state normal
-    Serial.println("State -> MENGIKUTI_GARIS");
-  }
-}
-
-// --- Fungsi Utilitas dan Kontrol Motor Dasar ---
-long ukurJarakCm() {
-  digitalWrite(TRIG_PIN, LOW); delayMicroseconds(2);
-  digitalWrite(TRIG_PIN, HIGH); delayMicroseconds(10);
-  digitalWrite(TRIG_PIN, LOW);
-  long durasi = pulseIn(ECHO_PIN, HIGH, 25000); 
-  return durasi * 0.034 / 2;
-}
-
-void maju(int kecepatan) {
-  digitalWrite(PIN_LED_HIJAU, HIGH); digitalWrite(PIN_LED_KUNING, LOW); digitalWrite(PIN_LED_MERAH, LOW);
-  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
-  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
-  analogWrite(ENA, kecepatan); analogWrite(ENB, kecepatan);
-}
-
-void putarKanan(int kecepatan) {
-  digitalWrite(PIN_LED_HIJAU, LOW); digitalWrite(PIN_LED_KUNING, HIGH); digitalWrite(PIN_LED_MERAH, LOW);
-  digitalWrite(IN1, LOW); digitalWrite(IN2, HIGH);
-  digitalWrite(IN3, HIGH); digitalWrite(IN4, LOW);
-  analogWrite(ENA, kecepatan); analogWrite(ENB, kecepatan);
-}
-
-void putarKiri(int kecepatan) {
-  digitalWrite(PIN_LED_HIJAU, LOW); digitalWrite(PIN_LED_KUNING, HIGH); digitalWrite(PIN_LED_MERAH, LOW);
-  digitalWrite(IN1, HIGH); digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW); digitalWrite(IN4, HIGH);
-  analogWrite(ENA, kecepatan); analogWrite(ENB, kecepatan);
-}
-
-void berhenti() {
-  digitalWrite(PIN_LED_HIJAU, LOW); digitalWrite(PIN_LED_KUNING, LOW); digitalWrite(PIN_LED_MERAH, HIGH);
-  digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
-  analogWrite(ENA, 0); analogWrite(ENB, 0);
-}
-```
-### Keunggulan Pendekatan Ini
-- **Responsif:** Robot dapat mendeteksi halangan atau menemukan garis *saat* sedang bermanuver, karena `loop()` tidak pernah diblokir.
-- **Terstruktur:** Kode menjadi sangat rapi. Setiap mode memiliki fungsinya sendiri. Jika Anda ingin mengubah cara robot mencari garis, Anda hanya perlu menyentuh fungsi `cariGaris_nonBlocking()`.
-- **Mudah Dikembangkan:** Ingin menambahkan state baru, misalnya `MODE_BATERAI_LEMAH`? Cukup tambahkan ke `enum`, buat fungsinya, dan atur logika transisinya.
-
-Selamat! Anda telah menyelesaikan seluruh modul, dari kontrol motor dasar hingga state machine yang kompleks. Anda sekarang memiliki fondasi yang sangat kuat untuk mengembangkan proyek robotika yang lebih canggih.
 
